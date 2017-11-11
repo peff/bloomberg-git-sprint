@@ -6,9 +6,10 @@ body {
 
 
 div.slide {
-	-webkit-box-shadow: 0 0 50px #8a7338;
-	-moz-box-shadow: 0 0 50px #8a7338;
-	box-shadow: 0 0 50px #8a7338;
+	-webkit-box-shadow: 0 0 0;
+	-moz-box-shadow: 0 0 0;
+	box-shadow: 0 0 0;
+	border: grey solid 2px;
 	background: #1f292c;
 	height: 90vh;
 	width: 133vh;
