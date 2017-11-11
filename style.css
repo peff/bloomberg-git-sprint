@@ -30,8 +30,14 @@ ol {
   margin-left: 2em;
 }
 
-p {
-  margin: 0;
+pre code {
+  text-align: left;
+  padding-left: 1em;
+  padding-right: 1em;
+  border: grey solid 2px;
+  border-radius: 10px;
+  background: #202020;
+  display: inline-block;
 }
 
 .center {
