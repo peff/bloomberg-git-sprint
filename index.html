@@ -1,0 +1,286 @@
+<html>
+<head>
+<meta name="viewport" content="width=1024" />
+<meta charset="UTF-8">
+<title></title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+<link href="fathom.css" rel="stylesheet" type="text/css" />
+<script src="jquery.min.js" type="text/javascript"></script>
+<script src="fathom.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	$("#presentation").fathom();
+	$(".slide").bind('activateslide.fathom', function(){
+		console.log($(this).text());
+	});
+});
+</script>
+</head>
+
+<body>
+<div id="presentation">
+<div class="slide">
+<div class="center">
+<h1>Getting Started Hacking on Git</h1>
+
+<p>Bloomberg Git Sprint<br/>
+Jeff King<br/>
+Nov 11-12, 2017</p>
+</div>
+</div>
+<div class="slide">
+<div class="center">
+<h1>Getting Git</h1>
+
+<pre><code>$ git clone https://github.com/git/git
+</code></pre>
+</div>
+</div>
+<div class="slide">
+<div class="center">
+<h1>Building Git</h1>
+
+<p>Ideally:</p>
+
+<pre><code>$ make
+</code></pre>
+
+<p>There's autoconf support, but it is usually not necessary.</p>
+</div>
+</div>
+<div class="slide">
+<div class="center">
+<h1>Build-time knobs</h1>
+
+<pre><code>$ make CFLAGS='-O0 -g -Wall -Werror'
+$ make USE_LIBPCRE=Yes
+</code></pre>
+
+<p>or</p>
+
+<pre><code>$ echo USE_LIBPCRE=Yes &gt;config.mak
+$ make
+</code></pre>
+
+<p>See <code>Makefile</code> for the full list.</p>
+</div>
+</div>
+<div class="slide">
+<div class="center">
+<h1>Testing Git</h1>
+
+<p>Build and run all tests:</p>
+
+<pre><code>$ make test
+</code></pre>
+
+<p>Run an individual test script:</p>
+
+<pre><code>$ cd t
+$ ./t4201-log.sh
+</code></pre>
+
+<p>Debugging a test:</p>
+
+<pre><code>$ ./t4201-log.sh -v -i -x
+</code></pre>
+</div>
+</div>
+<div class="slide">
+<div class="center">
+<h1>Overview of Git</h1>
+
+<p>History is just a directed acyclic graph over a set of
+content-addressable objects.</p>
+
+<p><img src="gollum.gif" height="50%"></p>
+</div>
+</div>
+<div class="slide">
+<div class="center">
+<h1>Git in Five Easy Slides</h1>
+
+<p>Further reading:</p>
+
+<p>  https://git-scm.com/book/en/v2</p>
+
+<p>  https://git-scm.com/book/en/v2/Git-Internals-Git-Objects</p>
+</div>
+</div>
+<div class="slide">
+<div class="small center">
+<p>Most data in git is stored in objects named after their sha1. Objects
+refer to each other by sha1 names:</p>
+
+<pre><code>$ echo foo | git hash-object --stdin
+257cc5642cb1a054f08cc83f2d943e56fd3ebe99
+
+$ git ls-tree -rt --abbrev 8fb5eb437957
+100644 blob 257cc5642cb1    file
+040000 tree 56a4e0993737    subdir
+100644 blob 5716ca5987cb    subdir/another-file
+
+$ git cat-file commit d38a39c44
+tree 8fb5eb437957edd0fafb56fc678fa1dc3b5b63ba
+parent 7034f601209422783ebcd02d9afca886f6203fe9
+author Jeff King &lt;peff@peff.net&gt; 1510384149 +0000
+committer Jeff King &lt;peff@peff.net&gt; 1510384149 +0000
+
+this is the commit message
+</code></pre>
+</div>
+</div>
+<div class="slide">
+<div class="center">
+<p>Refs map human-usable names to objects:</p>
+
+<pre><code>$ cat .git/refs/heads/master
+d38a39c44433f36a0e52dcae78e00358f104bf28
+
+$ cat .git/HEAD
+ref: refs/heads/master
+</code></pre>
+</div>
+</div>
+<div class="slide">
+<p>Most git commands are operations to modify or query objects or refnames.</p>
+
+<ul>
+<li><code>git commit</code>:
+
+<ul>
+<li>create blob objects for all files</li>
+<li>create hierarchy of trees pointing to blobs</li>
+<li>create commit object:
+
+<ul>
+<li>tree points to newly created tree</li>
+<li>parent points to current <code>HEAD</code></li>
+<li>collect commit message from user</li>
+</ul>
+</li>
+<li>update <code>HEAD</code> to point to new commit</li>
+</ul>
+</li>
+</ul>
+
+</div>
+<div class="slide">
+<ul>
+<li><code>git log</code>:
+
+<ul>
+<li>resolve ref names to commit objects</li>
+<li>traverse parent pointers, visiting each commit</li>
+<li>show author, commit message, etc</li>
+<li>show diff between commit and its parent</li>
+</ul>
+</li>
+</ul>
+
+</div>
+<div class="slide">
+<div class="center">
+<p>High-level user-facing commands are called <em>porcelain</em>.</p>
+
+<p>These can be implemented in terms of low-level commands called
+<em>plumbing</em>.</p>
+
+<p><code>git log master</code>:</p>
+
+<pre><code>start=$(git rev-parse master)
+for commit in $(git rev-list $start); do
+  git cat-file commit $commit
+  git diff-tree -p $commit^ $commit
+done
+</code></pre>
+</div>
+</div>
+<div class="slide">
+<h1>Exploring Git's Code</h1>
+
+<ul>
+<li>explore top-down</li>
+<li>plumbing commands are often more clear and expose internals</li>
+<li>the "main()" for <em>git foo</em> is in <code>cmd_foo()</code>, usually in <code>builtin/foo.c</code></li>
+<li>support code for a concept is in <code>foo.[ch]</code>
+
+<ul>
+<li>except <code>cache.h</code> is a dumping ground for some headers</li>
+</ul>
+</li>
+<li>documentation for APIs in header files</li>
+<li>some older documentation in <code>Documentation/technical</code></li>
+</ul>
+
+</div>
+<div class="slide">
+<h1>APIs</h1>
+
+<ul>
+<li>making C less difficult:
+
+<ul>
+<li>strbuf.[ch] -- dynamic string buffer</li>
+<li>string_list.[ch] -- dynamic list of strings</li>
+<li>ALLOC_GROW() -- dynamic arrays</li>
+<li>hashmap.[ch] -- key/value store</li>
+<li>run-command.[ch] -- portably spawning sub-programs</li>
+</ul>
+</li>
+</ul>
+
+</div>
+<div class="slide">
+<h1>APIs</h1>
+
+<ul>
+<li>Git-specific APIs
+
+<ul>
+<li>config.[ch] -- reading/writing config files</li>
+<li>sha1_name.c -- resolving object names</li>
+<li>sha1_file.c -- reading/writing object data</li>
+<li>revision.[ch] -- traversing commit graph</li>
+<li>diff.[ch] -- diffs between trees</li>
+<li>{object,commit,tree,blob}.h -- in-memory representation of objects</li>
+</ul>
+</li>
+</ul>
+
+</div>
+<div class="slide">
+<div class="center">
+<h1>"Object-oriented" C</h1>
+
+<pre><code>/* Declare an object (with an initializer) */
+struct strbuf msg = STRBUF_INIT;
+
+/* Call a "method" */
+strbuf_addstr(&amp;msg, "a string");
+
+/* Direct access to stuct members is normal */
+foo(msg.buf);
+
+/* Manual "destructor" */
+strbuf_release(&amp;msg);
+</code></pre>
+</div>
+</div>
+<div class="slide">
+<div class="center">
+<p>A lot of older code is <code>verb_noun</code> (or apparently random):</p>
+
+<pre><code>struct rev_info revs;
+init_revisions(&amp;revs);
+setup_revisions(argc, argv, &amp;revs, &amp;opts);
+while ((commit = get_revision(&amp;revs)) {
+  pretty_print_commit(&amp;context, commit, &amp;buf);
+}
+</code></pre>
+
+<p>Usually related functions are grouped in the header files.</p>
+</div>
+</div>
+</body>
+</html>

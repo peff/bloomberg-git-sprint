@@ -1,0 +1,32 @@
+#presentation {
+	vertical-align: top;
+	white-space: nowrap;
+}
+
+div.slide {
+	-webkit-box-shadow: 0 0 50px #c0c0c0;
+	-moz-box-shadow: 0 0 50px #c0c0c0;
+	box-shadow: 0 0 50px #c0c0c0;
+	-moz-border-radius: 20px;
+	-webkit-border-radius: 20px;
+	border-radius: 20px;
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	display: inline-block;
+	height: 90%;
+        width: 90%;
+        padding: 1%;
+	position: relative;
+	vertical-align: top;
+}
+
+div.inactiveslide {
+	will-change: opacity;
+	opacity: 0.4;
+}
+
+div.activeslide {
+	will-change: opacity;
+	opacity: 1;
+}
