@@ -44,6 +44,10 @@ pre code {
 	text-align: center;
 }
 
+.small {
+  font-size: 90%;
+}
+
 img {
 	border-radius: 10px;
 }
