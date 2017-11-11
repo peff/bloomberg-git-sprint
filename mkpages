@@ -1,0 +1,21 @@
+#!/bin/sh
+
+export GIT_INDEX_FILE=.git/pages-index
+ref=refs/heads/gh-pages
+cur=$(git rev-parse --verify $ref 2>/dev/null)
+
+rm -f $GIT_INDEX_FILE
+make
+
+git add -f *.html *.gif *.css *.js &&
+tree=$(git write-tree) &&
+if git diff-tree --quiet $ref $tree 2>/dev/null; then
+	echo >&2 "No changes."
+	exit 0
+fi &&
+commit=$(
+	echo "pages auto-build from $(git rev-parse HEAD)" |
+	git commit-tree ${cur:+-p $cur} $tree
+) &&
+git update-ref $ref $commit $cur &&
+git push github master gh-pages
