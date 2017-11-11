@@ -1,0 +1,46 @@
+body {
+	font-family: sans-serif;
+	font-size: 4.5vh;
+        background: #1f292c;
+}
+
+
+div.slide {
+	-webkit-box-shadow: 0 0 50px #8a7338;
+	-moz-box-shadow: 0 0 50px #8a7338;
+	box-shadow: 0 0 50px #8a7338;
+	background: #1f292c;
+	height: 90vh;
+	width: 133vh;
+	color: #ffffff;
+}
+
+h1 {
+	text-align: center;
+	font-size: 150%;
+}
+
+li {
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+}
+
+ol {
+  margin-left: 2em;
+}
+
+p {
+  margin: 0;
+}
+
+.center {
+	text-align: center;
+}
+
+img {
+	border-radius: 10px;
+}
+
+.notes {
+  visibility: hidden;
+}
